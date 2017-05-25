@@ -1,0 +1,114 @@
+# ripped from http://www.uni-kl.de/en/channel-codes/matrix-file-formats/
+
+About File Formats for Parity-Check Matrices
+Currently, two different ASCII file formats for storing parity-check matrices are widely used:
+The so-called AList format was invited by David MacKay et al. and is especially suitable for LDPC codes.
+The straightforward approach is to store ASCII characters "0" and "1", using whitespaces to separate entries within one row and the newline character to separate rows.
+Our decoding toolbox contains flexible parsers and formatters (written in Python) for both matrix storage formats in a submodule that can easily be extracted to be used stand-alone.
+The AList Format
+The AList format is based on explicit enumeration of non-zero indices in the matrix. It redundantly contains both column-based and row-based indices. All matrix indices are 1-based.
+
+Specifically, the first four lines are as follows:
+n m
+dvmax dcmax
+dv1 dv2 ... dvn
+dc1 dc2 ... dcm 
+with
+n  number of variable nodes (columns)
+m number of check nodes (rows)
+dvmax maximum variable node degree (i.e. max column weight)
+dcmax maximum check node degree (i.e. max row weight)
+dvi  i-th variable node degree (column weight)
+dcj j-th check node degree (row weight)
+The next n lines contain a list of non-zero entries of the columns, which is right-padded with zeros such that the number of entries is dvmax for each of these lines. Afterwards, m lines are created in the same way for the non-zero row indices.
+
+For example, the 3×7 parity-check matrix of the binary (7,4) Hamming code is represented by
+ 
+7 3
+ 
+ 
+3 4
+ 
+ 
+1 1 1 2 2 2 3
+ 
+ 
+4 4 4
+ 
+ 
+1 0 0
+ 
+ 
+2 0 0
+ 
+ 
+3 0 0
+ 
+ 
+1 2 0
+ 
+ 
+1 3 0
+ 
+ 
+2 3 0
+ 
+ 
+1 2 3
+ 
+ 
+1 4 5 7
+ 
+ 
+2 4 6 7
+ 
+ 
+3 5 6 7
+ 
+ 
+ 
+ 
+For non-binary alists the format is very similar to the format for binary codes. However the Galois field size and the value of the non-binary matrix entries need to be specified:
+In the first row a third value is introduced for the size of the Galois field q, e.g. 8 4 64 (8 symbols, 4 parity symbols, GF size 64).
+After each position entry its additional non-binary entry value is specified. The values are specified as powers of the primitive element, see here
+Example: 16 code symbols, 8 parity symbols, GF size q=64. First column has entries in row 4 and 6, with non-binary values (powers) of 32 and 39.
+ 
+16 8 64
+ 
+ 
+2 4
+ 
+ 
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ 
+ 
+4 4 4 4 4 4 4 4
+ 
+ 
+4 32 6 39
+ 
+ 
+3 6 7 36
+ 
+ 
+5 52 8 62
+ 
+ 
+1 27 2 60
+ 
+ 
+2 45 7 45
+ 
+ 
+3 21 6 2
+ 
+ 
+1 1 3 56 ...
+ 
+ 
+ 
+The 0/1 Format
+The 0/1 format simply contains ASCII 0 and 1 entries separated by whitespaces and newlines. Parsers should try to be flexible about the number and type of whitespaces (tabs, spaces) and the newline characters (Windows, UNIX).
+The above Hamming code matrix in 0/1 format is
+ 
+1 0 0 1 1 0 1 0 1 0 1 0 1 1 0 0 1 0 1 1 1
